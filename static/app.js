@@ -1,93 +1,41 @@
-const ICONS = [
-  {name:'GitHub', url:'https://raw.githubusercontent.com/devicons/devicon/master/icons/github/github-original.svg'},
-  {name:'GitLab', url:'https://raw.githubusercontent.com/devicons/devicon/master/icons/gitlab/gitlab-original.svg'},
-  {name:'Docker', url:'https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original.svg'},
-  {name:'Python', url:'https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg'}
-]
+import {
+  createCard,
+  createColumn,
+  getSettings,
+  getState,
+  removeCard,
+  removeColumn,
+  reorderColumnCards,
+  reorderColumns,
+  resetBackground,
+  saveSettings,
+  updateCard,
+  updateColumn,
+  uploadBackground,
+} from './js/api.js'
+import { createElement } from './js/dom-utils.js'
+import { DEFAULT_SETTINGS, applySettingsToDom, mergeSettings } from './js/settings-store.js'
+import { askConfirm, notifyError, notifySuccess } from './js/ui-feedback.js'
 
-// Settings from localStorage
-let settings = {cols_per_row: 3, column_width: 320, card_height: 0, dashboard_title: 'Start Dashboard', dashboard_bg_image: '', column_bg_color: '#ffffff', column_bg_opacity: 1.0, card_bg_color: '#ffffff', card_bg_opacity: 1.0}
+let settings = { ...DEFAULT_SETTINGS }
 async function loadSettings(){
   try{
-    const res = await fetch('/api/settings')
-    if(res.ok){
-      const s = await res.json()
-      // merge server settings into local object
-      settings.dashboard_title = (s.dashboard_title !== undefined && s.dashboard_title !== null) ? s.dashboard_title : settings.dashboard_title
-      // allow null/empty to clear previous value
-      settings.dashboard_bg_image = (s.dashboard_bg_image !== undefined) ? s.dashboard_bg_image : settings.dashboard_bg_image
-      settings.cols_per_row = (s.cols_per_row !== undefined && s.cols_per_row !== null) ? s.cols_per_row : settings.cols_per_row
-      settings.column_width = (s.column_width !== undefined && s.column_width !== null) ? s.column_width : settings.column_width
-      settings.card_height = (s.card_height !== undefined && s.card_height !== null) ? s.card_height : settings.card_height
-      settings.column_bg_color = (s.column_bg_color !== undefined && s.column_bg_color !== null) ? s.column_bg_color : settings.column_bg_color
-      settings.column_bg_opacity = (s.column_bg_opacity !== undefined && s.column_bg_opacity !== null) ? s.column_bg_opacity : settings.column_bg_opacity
-      settings.card_bg_color = (s.card_bg_color !== undefined && s.card_bg_color !== null) ? s.card_bg_color : settings.card_bg_color
-      settings.card_bg_opacity = (s.card_bg_opacity !== undefined && s.card_bg_opacity !== null) ? s.card_bg_opacity : settings.card_bg_opacity
+    const incoming = await getSettings()
+    if(incoming){
+      settings = mergeSettings(settings, incoming)
       applySettings()
-      const el = document.getElementById('dashboardTitle')
-      if(el) el.textContent = settings.dashboard_title
     }
   }catch(e){
     console.warn('Failed loading settings', e)
   }
 }
 function applySettings(){
-  document.documentElement.style.setProperty('--cols-per-row', settings.cols_per_row)
-  document.documentElement.style.setProperty('--column-width', settings.column_width + 'px')
-  if(settings.card_height > 0){
-    document.documentElement.style.setProperty('--card-height', settings.card_height + 'px')
-  } else {
-    document.documentElement.style.setProperty('--card-height', 'auto')
-  }
-  // apply dashboard background: image takes precedence
-  const bgEl = document.getElementById('bg')
-  if(bgEl){
-    if(settings.dashboard_bg_image && settings.dashboard_bg_image.trim()){
-      bgEl.style.backgroundImage = `url(${settings.dashboard_bg_image})`
-    } else {
-      bgEl.style.backgroundImage = ''
-    }
-  } else {
-    // fallback to body background if #bg is missing
-    if(settings.dashboard_bg_image && settings.dashboard_bg_image.trim()){
-      document.body.style.background = `url(${settings.dashboard_bg_image}) center/cover no-repeat`;
-    } else {
-      document.body.style.background = '';
-    }
-  }
-  // apply column/card background colors (convert hex + opacity to rgba)
-  function hexToRgb(hex){
-    if(!hex) return null
-    const h = hex.replace('#','')
-    const bigint = parseInt(h.length===3? h.split('').map(c=>c+c).join('') : h, 16)
-    const r = (bigint >> 16) & 255
-    const g = (bigint >> 8) & 255
-    const b = bigint & 255
-    return {r,g,b}
-  }
-  const root = document.documentElement
-  try{
-    if(settings.column_bg_color){
-      const c = hexToRgb(settings.column_bg_color)
-      const op = (settings.column_bg_opacity !== undefined && settings.column_bg_opacity !== null) ? parseFloat(settings.column_bg_opacity) : 1.0
-      root.style.setProperty('--column-bg', `rgba(${c.r}, ${c.g}, ${c.b}, ${op})`)
-    }
-    if(settings.card_bg_color){
-      const c2 = hexToRgb(settings.card_bg_color)
-      const op2 = (settings.card_bg_opacity !== undefined && settings.card_bg_opacity !== null) ? parseFloat(settings.card_bg_opacity) : 1.0
-      root.style.setProperty('--card-bg', `rgba(${c2.r}, ${c2.g}, ${c2.b}, ${op2})`)
-    }
-  }catch(err){
-    // ignore color parse errors
-  }
+  applySettingsToDom(settings)
 }
 
 async function fetchState(){
-  const res = await fetch('/api/state');
-  return res.json();
+  return getState()
 }
-
-function el(tag, cls, txt){ const e = document.createElement(tag); if(cls) e.className = cls; if(txt) e.textContent = txt; return e }
 
 let dragState = { type: null, columnId: null, cardId: null }
 
@@ -102,9 +50,9 @@ function render(board){
     main._dndInitialized = true
   }
   board.columns.forEach(col => {
-    const c = el('div','column')
+    const c = createElement('div','column')
     c.dataset.id = col.id
-    const colTitle = el('div','col-title', col.name)
+    const colTitle = createElement('div','col-title', col.name)
     colTitle.draggable = true
     c.appendChild(colTitle)
     // column drag handlers
@@ -119,7 +67,7 @@ function render(board){
       document.querySelectorAll('.column').forEach(x=>x.classList.remove('drop-target'))
     })
     col.cards.forEach(card => {
-      const cd = el('div','card')
+      const cd = createElement('div','card')
       cd.dataset.id = card.id
       cd.draggable = true
       cd.style.cursor = 'grab'
@@ -160,13 +108,13 @@ function render(board){
         
         // reorder cards in column
         const order = Array.from(c.querySelectorAll('.card')).map(x=>x.dataset.id)
-        await fetch('/api/column/'+col.id+'/reorder-cards', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({order})})
+        await reorderColumnCards(col.id, order)
       })
-      const title = el('div','title')
+      const title = createElement('div','title')
       if(card.icon){ const img = document.createElement('img'); img.src = card.icon; img.style.height='18px'; img.style.marginRight='6px'; title.appendChild(img) }
       if(card.link){ const a = document.createElement('a'); a.href=card.link; a.textContent=card.title; a.target='_blank'; title.appendChild(a)} else { title.appendChild(document.createTextNode(card.title)) }
       cd.appendChild(title)
-      if(card.description) { const d = el('div','desc', card.description); cd.appendChild(d) }
+      if(card.description) { const d = createElement('div','desc', card.description); cd.appendChild(d) }
       const menu = document.createElement('button'); menu.className = 'card-menu'; menu.textContent = '⋯'
       menu.addEventListener('click', (ev)=>{ ev.stopPropagation(); openModalForCard(card) })
       cd.appendChild(menu)
@@ -191,7 +139,7 @@ function render(board){
       
       c.appendChild(draggedEl)
       const order = Array.from(c.querySelectorAll('.card')).map(x=>x.dataset.id)
-      await fetch('/api/column/'+col.id+'/reorder-cards', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({order})})
+      await reorderColumnCards(col.id, order)
     })
 
     main.appendChild(c)
@@ -262,7 +210,7 @@ async function boardDrop(ev){
   if(draggedEl){
     ph.parentNode.insertBefore(draggedEl, ph)
     const order = Array.from(document.querySelectorAll('.column')).map(x=>x.dataset.id)
-    await fetch('/api/column/reorder', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({order})})
+    await reorderColumns(order)
   }
   clearPlaceholder()
   document.querySelectorAll('.column').forEach(c=>c.classList.remove('drop-target'))
@@ -307,7 +255,7 @@ document.getElementById('modalClose').addEventListener('click', closeModal)
 function openModalForCard(card){
   modal.classList.remove('hidden')
   if(card){
-    modalTitle.textContent = 'Редагувати картку'
+    modalTitle.textContent = 'Edit card'
     modalForm.id.value = card.id
     modalForm.title.value = card.title
     modalForm.link.value = card.link || ''
@@ -317,7 +265,7 @@ function openModalForCard(card){
     showIconPreview(card.icon)
     deleteBtn.style.display = 'inline-block'
   } else {
-    modalTitle.textContent = 'Додати картку'
+    modalTitle.textContent = 'Add card'
     modalForm.reset()
     modalForm.id.value = ''
     showIconPreview('')
@@ -337,24 +285,23 @@ modalForm.addEventListener('submit', async e=>{
   const f = e.target;
   const payload = { title: f.title.value, link: f.link.value, description: f.description.value, icon: f.icon.value, column_id: parseInt(f.column_id.value) }
   if(f.id.value){
-    const res = await fetch('/api/card/' + f.id.value, {method:'PUT', headers:{'content-type':'application/json'}, body:JSON.stringify(payload)})
-    if(res.ok){ await load(); closeModal() } else { alert('Error updating') }
+    const res = await updateCard(f.id.value, payload)
+    if(res.ok){ await load(); closeModal(); notifySuccess('Card updated') } else { notifyError('Failed to update card') }
   } else {
-    const res = await fetch('/api/card', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload)})
-    if(res.ok){ await load(); closeModal() } else { alert('Error creating') }
+    const res = await createCard(payload)
+    if(res.ok){ await load(); closeModal(); notifySuccess('Card created') } else { notifyError('Failed to create card') }
   }
 })
 
 deleteBtn.addEventListener('click', async ()=>{
   const id = modalForm.id.value; if(!id) return;
-  if(!confirm('Видалити картку?')) return;
-  const res = await fetch('/api/card/' + id, {method:'DELETE'});
-  if(res.status === 204){ await load(); closeModal() } else { alert('Error deleting') }
+  const ok = await askConfirm('Delete this card?', { confirmLabel: 'Delete' })
+  if(!ok) return;
+  const res = await removeCard(id);
+  if(res.status === 204){ await load(); closeModal(); notifySuccess('Card deleted') } else { notifyError('Failed to delete card') }
 })
 
 // main page column form removed; column management done via Settings modal
-
-load();
 
 // Settings modal logic
 const settingsModal = document.getElementById('settingsModal');
@@ -363,6 +310,7 @@ const settingsCloseBtn = document.getElementById('settingsCloseBtn');
 const openSettings = document.getElementById('openSettings');
 const columnsList = document.getElementById('columnsList');
 const settingsAddCol = document.getElementById('settingsAddCol');
+const resetTabCardFormBtn = document.getElementById('resetTabCardForm');
 
 openSettings.addEventListener('click', async ()=>{
   settingsModal.classList.remove('hidden')
@@ -407,17 +355,16 @@ if(bgFileInput){
   bgFileInput.addEventListener('change', async e=>{
     const file = e.target.files[0]
     if(!file) return
-    const fd = new FormData(); fd.append('file', file)
     try{
-      const res = await fetch('/api/upload-bg', {method:'POST', body: fd})
+      const res = await uploadBackground(file)
       if(!res.ok) throw new Error('upload failed')
-      const data = await res.json()
+      await res.json()
       // set returned url into the image input so user can save settings
       // refresh settings from server (upload endpoint updates DB)
       await loadSettings()
-      alert('Фон завантажено і встановлено на сервері.')
+      notifySuccess('Background uploaded and applied')
     }catch(err){
-      alert('Помилка завантаження фонового зображення')
+      notifyError('Failed to upload background image')
     }
   })
 }
@@ -425,17 +372,18 @@ if(bgFileInput){
 const resetBgBtn = document.getElementById('resetBgBtn')
 if(resetBgBtn){
   resetBgBtn.addEventListener('click', async ()=>{
-    if(!confirm('Видалити фонове зображення?')) return
+    const ok = await askConfirm('Delete background image?', { confirmLabel: 'Delete' })
+    if(!ok) return
     try{
-      const res = await fetch('/api/settings/bg', {method: 'DELETE'})
+      const res = await resetBackground()
       if(res.status === 204){
         await loadSettings()
-        alert('Фон скинуто')
+        notifySuccess('Background reset')
       } else {
-        alert('Помилка скидання фону')
+        notifyError('Failed to reset background')
       }
     }catch(e){
-      alert('Помилка скидання фону')
+      notifyError('Failed to reset background')
     }
   })
 }
@@ -456,12 +404,12 @@ document.getElementById('settingsLayout').addEventListener('submit', async e=>{
     card_bg_opacity: settings.card_bg_opacity || 1.0
   }
   try{
-    const res = await fetch('/api/settings', {method:'PUT', headers:{'content-type':'application/json'}, body:JSON.stringify(payload)})
+    const res = await saveSettings(payload)
     if(!res.ok) throw new Error('save failed')
     await loadSettings()
-    alert('Налаштування збережено')
+    notifySuccess('Settings saved')
   }catch(err){
-    alert('Помилка збереження налаштувань')
+    notifyError('Failed to save settings')
   }
 })
 
@@ -472,20 +420,21 @@ async function refreshSettings(){
     const row = document.createElement('div'); row.className = 'col-item'
     const colname = document.createElement('div'); colname.className = 'col-name'; colname.textContent = col.name
     const actions = document.createElement('div'); actions.className = 'col-actions'
-    const edit = document.createElement('button'); edit.className = 'edit-col'; edit.textContent = 'Ред.';
+    const edit = document.createElement('button'); edit.className = 'edit-col'; edit.textContent = 'Edit';
     edit.addEventListener('click', async ()=>{
-      const newName = prompt('Нова назва колонки:', col.name)
+      const newName = prompt('New column name:', col.name)
       if(newName && newName.trim()){
-        const res = await fetch('/api/column/' + col.id, {method:'PUT', headers:{'content-type':'application/json'}, body:JSON.stringify({name: newName.trim()})})
-        if(res.ok){ await load(); await refreshSettings() } else alert('Помилка при редагуванні')
+        const res = await updateColumn(col.id, {name: newName.trim()})
+        if(res.ok){ await load(); await refreshSettings(); notifySuccess('Column updated') } else notifyError('Failed to update column')
       }
     })
-    const del = document.createElement('button'); del.textContent = 'Видалити';
+    const del = document.createElement('button'); del.textContent = 'Delete';
     del.addEventListener('click', async ()=>{
-      if(!confirm('Видалити колонку і всі її картки?')) return;
-      const res = await fetch('/api/column/' + col.id, {method:'DELETE'})
+      const ok = await askConfirm('Delete this column and all its cards?', { confirmLabel: 'Delete' })
+      if(!ok) return;
+      const res = await removeColumn(col.id)
       if(res.status === 204) await load(), refreshSettings()
-      else alert('Error deleting column')
+      else notifyError('Failed to delete column')
     })
     actions.appendChild(edit); actions.appendChild(del)
     row.appendChild(colname); row.appendChild(actions)
@@ -495,8 +444,8 @@ async function refreshSettings(){
 
 settingsAddCol.addEventListener('submit', async e=>{
   e.preventDefault();
-  const f = e.target; const res = await fetch('/api/column',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:f.name.value})})
-  if(res.ok){ f.reset(); await load(); await refreshSettings() } else alert('Error adding column')
+  const f = e.target; const res = await createColumn({name:f.name.value})
+  if(res.ok){ f.reset(); await load(); await refreshSettings(); notifySuccess('Column added') } else notifyError('Failed to add column')
 })
 
 // Tab card form - add/edit cards from Settings
@@ -506,18 +455,18 @@ tabCardForm.addEventListener('submit', async e=>{
   const f = e.target;
   const payload = { title: f.title.value, link: f.link.value, description: f.description.value, icon: f.icon.value, column_id: parseInt(f.column_id.value) }
   if(f.id.value){
-    const res = await fetch('/api/card/' + f.id.value, {method:'PUT', headers:{'content-type':'application/json'}, body:JSON.stringify(payload)})
-    if(res.ok){ await load(); f.reset(); document.getElementById('resetTabCardForm').style.display = 'none' } else { alert('Error updating') }
+    const res = await updateCard(f.id.value, payload)
+    if(res.ok){ await load(); f.reset(); resetTabCardFormBtn.classList.add('is-hidden'); notifySuccess('Card updated') } else { notifyError('Failed to update card') }
   } else {
-    const res = await fetch('/api/card', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload)})
-    if(res.ok){ await load(); f.reset() } else { alert('Error creating') }
+    const res = await createCard(payload)
+    if(res.ok){ await load(); f.reset(); notifySuccess('Card added') } else { notifyError('Failed to create card') }
   }
 })
 
-document.getElementById('resetTabCardForm').addEventListener('click', ()=>{
+resetTabCardFormBtn.addEventListener('click', ()=>{
   tabCardForm.reset()
   tabCardForm.id.value = ''
-  document.getElementById('resetTabCardForm').style.display = 'none'
+  resetTabCardFormBtn.classList.add('is-hidden')
 })
 
 // Tab switching logic
