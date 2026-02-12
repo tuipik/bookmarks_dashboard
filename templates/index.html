@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Start Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div id="bg" aria-hidden="true"></div>
+    <header>
+      <h1 id="dashboardTitle">Start Dashboard</h1>
+      <div class="header-actions">
+        <button id="openSettings">Settings</button>
+      </div>
+    </header>
+    <main id="board"></main>
+
+    <!-- aside removed: column creation moved to Settings; card creation accessible from Settings -->
+
+    <!-- Modal for add/edit card -->
+    <div id="modal" class="hidden">
+      <div class="modal-backdrop" id="modalClose"></div>
+      <div class="modal-window">
+        <h3 id="modalTitle">Картка</h3>
+        <form id="modalForm">
+          <input type="hidden" name="id">
+          <label>Назва<br><input name="title" required></label>
+          <label>Посилання<br><input name="link"></label>
+          <label>Опис<br><textarea name="description"></textarea></label>
+          <label>Колонка<br><select name="column_id"></select></label>
+          <label>Іконка<br>
+            <input type="url" name="icon" placeholder="https://example.com/icon.svg">
+            <div id="iconPreview"></div>
+          </label>
+          <div class="modal-actions">
+            <button type="submit" id="saveBtn">Зберегти</button>
+            <button type="button" id="deleteBtn" class="danger">Видалити</button>
+            <button type="button" id="cancelBtn">Скасувати</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Settings modal -->
+    <div id="settingsModal" class="hidden">
+      <div class="modal-backdrop" id="settingsClose"></div>
+      <div class="modal-window">
+        <h3>Settings</h3>
+        <div class="tabs-header">
+          <button class="tab-btn active" data-tab="layout">Макет</button>
+          <button class="tab-btn" data-tab="columns">Колонки</button>
+          <button class="tab-btn" data-tab="cards">Картки</button>
+        </div>
+
+        <!-- Макет tab -->
+        <div id="layout-tab" class="tab-content active">
+          <form id="settingsLayout">
+            <label>Назва дашборду<br><input type="text" name="dashboard_title" value="Start Dashboard"></label>
+            <label>Або завантажити з комп'ютера<br><input type="file" id="dashboard_bg_file" accept="image/*"></label>
+            <div style="margin-top:8px">
+              <button type="button" id="resetBgBtn">Скинути фон</button>
+            </div>
+            <label>Макс. колонок на ряд<br><input type="number" name="cols_per_row" min="1" max="10" value="3"></label>
+            <label>Ширина колонки (px)<br><input type="number" name="column_width" min="200" value="320"></label>
+            <label>Висота картки (px)<br><input type="number" name="card_height" min="50" value="0" placeholder="0 = без обмеження"></label>
+            <label>Колір заливки колонки<br>
+              <input type="color" name="column_bg_color" id="column_bg_color" value="#ffffff">
+            </label>
+            <label>Прозорість колонки (%)<br>
+              <input type="range" id="column_bg_opacity" name="column_bg_opacity" min="0" max="100" step="1" value="100">
+              <span id="column_bg_opacity_val">100%</span>
+            </label>
+            <label>Колір заливки картки<br>
+              <input type="color" name="card_bg_color" id="card_bg_color" value="#ffffff">
+            </label>
+            <label>Прозорість картки (%)<br>
+              <input type="range" id="card_bg_opacity" name="card_bg_opacity" min="0" max="100" step="1" value="100">
+              <span id="card_bg_opacity_val">100%</span>
+            </label>
+            <button type="submit">Зберегти</button>
+          </form>
+        </div>
+
+        <!-- Колонки tab -->
+        <div id="columns-tab" class="tab-content">
+          <div id="columnsList"></div>
+          <form id="settingsAddCol">
+            <label>Нова колонка<br><input name="name" required></label>
+            <button type="submit">Додати колонку</button>
+          </form>
+        </div>
+
+        <!-- Картки tab -->
+        <div id="cards-tab" class="tab-content">
+          <h4>Додати нову картку</h4>
+          <form id="tabCardForm">
+            <input type="hidden" name="id">
+            <label>Назва<br><input name="title" required></label>
+            <label>Посилання<br><input name="link"></label>
+            <label>Опис<br><textarea name="description"></textarea></label>
+            <label>Іконка (URL)<br><input type="url" name="icon" placeholder="https://example.com/icon.svg"></label>
+            <label>Колонка<br><select name="column_id"></select></label>
+            <button type="submit">Додати картку</button>
+            <button type="button" id="resetTabCardForm" style="display:none">Скасувати</button>
+          </form>
+        </div>
+
+        <div style="margin-top:8px;text-align:right"><button id="settingsCloseBtn">Закрити</button></div>
+      </div>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
