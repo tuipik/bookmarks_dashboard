@@ -87,6 +87,7 @@ main#board {
   position: relative;
   margin-bottom: 8px;
   padding: 8px;
+  padding-top: 12px;
   height: var(--card-height, auto);
   overflow-y: auto;
   border: 1px solid var(--line-soft);
@@ -98,8 +99,8 @@ main#board {
 
 .card .card-menu {
   position: absolute;
+  top: 6px;
   right: 8px;
-  top: 8px;
   padding: 4px 6px;
   border: none;
   background: none;
@@ -112,14 +113,49 @@ main#board {
   color: #000;
 }
 
+.card .card-drag-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px 0 8px 0;
+  background: rgba(43, 108, 176, 0.9);
+  color: transparent;
+  font-size: 0;
+  cursor: grab;
+  z-index: 1;
+}
+
+.card .card-drag-handle:hover {
+  background: rgba(43, 108, 176, 1);
+}
+
+.card .card-drag-handle:active {
+  cursor: grabbing;
+}
+
 .card .title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 30px;
+  padding-right: 30px;
   font-size: 17px;
   font-weight: 600;
 }
 
+.card .title .card-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex: 0 0 22px;
+}
+
 .card .desc {
   margin-top: 6px;
-  font-size: 14px;
+  font-size: 12px;
   color: #334155;
   white-space: pre-wrap;
 }
@@ -204,6 +240,13 @@ select:focus-visible {
 
 .modal-window label {
   font-size: 14px;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .modal-actions {

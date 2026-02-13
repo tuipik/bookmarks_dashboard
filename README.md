@@ -71,3 +71,25 @@ Files:
 - `templates/index.html` - frontend template
 - `static/*` - CSS and JS assets
 
+Docker (development):
+
+```bash
+docker compose up --build
+```
+
+Open http://localhost:5001
+
+Docker (production-like):
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+Open http://localhost:8000
+
+Stop containers:
+
+```bash
+docker compose down
+docker compose -f docker-compose.prod.yml down
+```

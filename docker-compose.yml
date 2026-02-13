@@ -1,0 +1,27 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: start-dashboard-dev
+    command: >
+      sh -c "alembic upgrade head &&
+             python -m pip install -r /app/requirements-dev.txt &&
+             python app.py"
+    ports:
+      - "5001:5001"
+    environment:
+      APP_ENV: development
+      SECRET_KEY: dev-secret-change-me
+      RATELIMIT_STORAGE_URI: memory://
+      DB_PATH: /app/data/data.db
+      SQLALCHEMY_DATABASE_URI: sqlite:////app/data/data.db
+      UPLOAD_DIR: /app/static/uploads
+    volumes:
+      - .:/app
+      - app_data:/app/data
+      - app_uploads:/app/static/uploads
+
+volumes:
+  app_data:
+  app_uploads:

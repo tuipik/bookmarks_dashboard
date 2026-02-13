@@ -4,10 +4,13 @@ from pathlib import Path
 
 class BaseConfig:
     BASE_DIR = Path(__file__).resolve().parent.parent
-    DB_PATH = BASE_DIR / "data.db"
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_PATH}"
+    DB_PATH = Path(os.getenv("DB_PATH", str(BASE_DIR / "data.db")))
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        "SQLALCHEMY_DATABASE_URI",
+        f"sqlite:///{DB_PATH}",
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    UPLOAD_DIR = BASE_DIR / "static" / "uploads"
+    UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", str(BASE_DIR / "static" / "uploads")))
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB
     ALLOWED_UPLOAD_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
     ALLOWED_UPLOAD_MIMETYPES = {

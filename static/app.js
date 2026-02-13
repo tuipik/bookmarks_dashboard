@@ -69,16 +69,19 @@ function render(board){
     col.cards.forEach(card => {
       const cd = createElement('div','card')
       cd.dataset.id = card.id
-      cd.draggable = true
-      cd.style.cursor = 'grab'
-      // card dragstart
-      cd.addEventListener('dragstart', (ev)=>{
+      const dragHandle = createElement('button', 'card-drag-handle')
+      dragHandle.type = 'button'
+      dragHandle.draggable = true
+      dragHandle.title = 'Drag card'
+      dragHandle.setAttribute('aria-label', 'Drag card')
+      // card dragstart (handle only)
+      dragHandle.addEventListener('dragstart', (ev)=>{
         ev.stopPropagation()
         dragState = { type: 'card', columnId: String(col.id), cardId: String(card.id) }
         ev.dataTransfer.setData('text/plain', 'card:'+card.id+':'+col.id)
         ev.dataTransfer.effectAllowed = 'move'
       })
-      cd.addEventListener('dragend', ()=>{
+      dragHandle.addEventListener('dragend', ()=>{
         dragState = { type: null, columnId: null, cardId: null }
       })
       // card dragover/drop: only accept cards from same column
@@ -111,12 +114,13 @@ function render(board){
         await reorderColumnCards(col.id, order)
       })
       const title = createElement('div','title')
-      if(card.icon){ const img = document.createElement('img'); img.src = card.icon; img.style.height='18px'; img.style.marginRight='6px'; title.appendChild(img) }
+      if(card.icon){ const img = document.createElement('img'); img.src = card.icon; img.className = 'card-icon'; title.appendChild(img) }
       if(card.link){ const a = document.createElement('a'); a.href=card.link; a.textContent=card.title; a.target='_blank'; title.appendChild(a)} else { title.appendChild(document.createTextNode(card.title)) }
       cd.appendChild(title)
       if(card.description) { const d = createElement('div','desc', card.description); cd.appendChild(d) }
       const menu = document.createElement('button'); menu.className = 'card-menu'; menu.textContent = '⋯'
       menu.addEventListener('click', (ev)=>{ ev.stopPropagation(); openModalForCard(card) })
+      cd.appendChild(dragHandle)
       cd.appendChild(menu)
       // double-click also opens edit
       cd.addEventListener('dblclick', ()=> openModalForCard(card))

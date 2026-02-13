@@ -31,6 +31,7 @@
           <label>Column<br><select name="column_id"></select></label>
           <label>Icon<br>
             <input type="url" name="icon" placeholder="https://example.com/icon.svg">
+            <small class="field-hint">Browse icons: <a href="https://dashboardicons.com/" target="_blank" rel="noopener noreferrer">dashboardicons.com</a></small>
             <div id="iconPreview"></div>
           </label>
           <div class="modal-actions">
@@ -99,7 +100,10 @@
             <label>Title<br><input name="title" required></label>
             <label>Link<br><input name="link"></label>
             <label>Description<br><textarea name="description"></textarea></label>
-            <label>Icon (URL)<br><input type="url" name="icon" placeholder="https://example.com/icon.svg"></label>
+            <label>Icon (URL)<br>
+              <input type="url" name="icon" placeholder="https://example.com/icon.svg">
+              <small class="field-hint">Browse icons: <a href="https://dashboardicons.com/" target="_blank" rel="noopener noreferrer">dashboardicons.com</a></small>
+            </label>
             <label>Column<br><select name="column_id"></select></label>
             <button type="submit">Add card</button>
             <button type="button" id="resetTabCardForm" class="is-hidden">Cancel</button>

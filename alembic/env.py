@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
@@ -14,18 +15,19 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-alembic_url = config.get_main_option("sqlalchemy.url")
+# Keep Alembic and application pointed to the same DB.
+# Priority: environment URL (docker/runtime) -> alembic config URL (tests/cli).
+effective_db_url = os.getenv("SQLALCHEMY_DATABASE_URI") or config.get_main_option("sqlalchemy.url")
 app = create_app(
-    test_config={"SQLALCHEMY_DATABASE_URI": alembic_url} if alembic_url else None,
+    test_config={"SQLALCHEMY_DATABASE_URI": effective_db_url} if effective_db_url else None,
 )
 _ = (Column, Card, Settings)
 target_metadata = db.metadata
 
 
 def get_url() -> str:
-    url = config.get_main_option("sqlalchemy.url")
-    if url:
-        return url
+    if effective_db_url:
+        return effective_db_url
     with app.app_context():
         return app.config["SQLALCHEMY_DATABASE_URI"]
 
