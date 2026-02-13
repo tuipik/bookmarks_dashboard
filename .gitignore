@@ -82,5 +82,8 @@ Thumbs.db
 .Trashes
 
 # Project-specific
+data/
+storage/*
+!storage/.gitkeep
 static/uploads/*
 !static/uploads/.gitkeep
