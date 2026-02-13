@@ -1,13 +1,13 @@
 export const DEFAULT_SETTINGS = {
   cols_per_row: 3,
   column_width: 320,
-  card_height: 0,
+  card_height: 100,
   dashboard_title: "Start Dashboard",
   dashboard_bg_image: "",
   column_bg_color: "#ffffff",
-  column_bg_opacity: 1.0,
+  column_bg_opacity: 0.5,
   card_bg_color: "#ffffff",
-  card_bg_opacity: 1.0,
+  card_bg_opacity: 0.5,
 };
 
 export function mergeSettings(current, incoming) {
@@ -77,4 +77,3 @@ function hexToRgb(hex) {
     b: intValue & 255,
   };
 }
-

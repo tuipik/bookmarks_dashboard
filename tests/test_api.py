@@ -71,6 +71,15 @@ def test_settings_validation_rejects_invalid_color(client):
     assert "hex color" in payload["error"]["message"]
 
 
+def test_default_settings_values(client):
+    res = client.get("/api/settings")
+    assert res.status_code == 200
+    payload = res.get_json()
+    assert payload["card_height"] == 100
+    assert payload["column_bg_opacity"] == 0.5
+    assert payload["card_bg_opacity"] == 0.5
+
+
 def test_reorder_cards_rejects_partial_payload(client):
     state = client.get("/api/state").get_json()
     col = state["columns"][0]

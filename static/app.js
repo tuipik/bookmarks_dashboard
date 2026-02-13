@@ -39,6 +39,29 @@ async function fetchState(){
 
 let dragState = { type: null, columnId: null, cardId: null }
 
+function appendLinkedText(container, text){
+  const urlRegex = /(https?:\/\/[^\s<>"']+)/g
+  let lastIndex = 0
+  let match
+  while((match = urlRegex.exec(text)) !== null){
+    const start = match.index
+    const end = start + match[0].length
+    if(start > lastIndex){
+      container.appendChild(document.createTextNode(text.slice(lastIndex, start)))
+    }
+    const anchor = document.createElement('a')
+    anchor.href = match[0]
+    anchor.target = '_blank'
+    anchor.rel = 'noopener noreferrer'
+    anchor.textContent = match[0]
+    container.appendChild(anchor)
+    lastIndex = end
+  }
+  if(lastIndex < text.length){
+    container.appendChild(document.createTextNode(text.slice(lastIndex)))
+  }
+}
+
 function render(board){
   const main = document.getElementById('board'); main.innerHTML='';
   // ensure board-level drag handlers for easier drops
@@ -117,7 +140,11 @@ function render(board){
       if(card.icon){ const img = document.createElement('img'); img.src = card.icon; img.className = 'card-icon'; title.appendChild(img) }
       if(card.link){ const a = document.createElement('a'); a.href=card.link; a.textContent=card.title; a.target='_blank'; title.appendChild(a)} else { title.appendChild(document.createTextNode(card.title)) }
       cd.appendChild(title)
-      if(card.description) { const d = createElement('div','desc', card.description); cd.appendChild(d) }
+      if(card.description) {
+        const d = createElement('div', 'desc')
+        appendLinkedText(d, card.description)
+        cd.appendChild(d)
+      }
       const menu = document.createElement('button'); menu.className = 'card-menu'; menu.textContent = '⋯'
       menu.addEventListener('click', (ev)=>{ ev.stopPropagation(); openModalForCard(card) })
       cd.appendChild(dragHandle)

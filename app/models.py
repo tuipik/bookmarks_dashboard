@@ -63,11 +63,11 @@ class Settings(db.Model):
     dashboard_bg_image = db.Column(db.String(2048), nullable=True)
     cols_per_row = db.Column(db.Integer, nullable=False, default=3)
     column_width = db.Column(db.Integer, nullable=False, default=320)
-    card_height = db.Column(db.Integer, nullable=False, default=0)
+    card_height = db.Column(db.Integer, nullable=False, default=100)
     column_bg_color = db.Column(db.String(7), nullable=False, default="#ffffff")
-    column_bg_opacity = db.Column(db.Float, nullable=False, default=1.0)
+    column_bg_opacity = db.Column(db.Float, nullable=False, default=0.5)
     card_bg_color = db.Column(db.String(7), nullable=False, default="#ffffff")
-    card_bg_opacity = db.Column(db.Float, nullable=False, default=1.0)
+    card_bg_opacity = db.Column(db.Float, nullable=False, default=0.5)
 
     def to_dict(self) -> dict:
         return {
