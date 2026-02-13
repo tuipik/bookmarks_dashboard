@@ -44,9 +44,15 @@ FORMAT_TO_MIME = {
     "WEBP": "image/webp",
     "GIF": "image/gif",
 }
+FORMAT_MIME_ALIASES = {
+    "PNG": {"image/png"},
+    "JPEG": {"image/jpeg", "image/jpg", "image/pjpeg"},
+    "WEBP": {"image/webp"},
+    "GIF": {"image/gif"},
+}
 FORMAT_TO_EXTS = {
     "PNG": {".png"},
-    "JPEG": {".jpg", ".jpeg"},
+    "JPEG": {".jpg", ".jpeg", ".jfif"},
     "WEBP": {".webp"},
     "GIF": {".gif"},
 }
@@ -254,16 +260,22 @@ def api_upload_bg():
     allowed_mime = current_app.config["ALLOWED_UPLOAD_MIMETYPES"]
     if ext not in allowed_ext:
         return error_response("unsupported file extension", 400)
-    if file.mimetype not in allowed_mime:
-        return error_response("unsupported file type", 400)
     image_format, width, height = _inspect_image(file)
     if not image_format:
         return error_response("invalid image content", 400)
     expected_mime = FORMAT_TO_MIME.get(image_format)
+    accepted_mimes = FORMAT_MIME_ALIASES.get(image_format, {expected_mime})
     expected_exts = FORMAT_TO_EXTS.get(image_format, set())
     if expected_mime not in allowed_mime:
         return error_response("unsupported image format", 400)
-    if file.mimetype != expected_mime:
+    # Browsers may send aliases (image/jpg, image/pjpeg) or generic
+    # application/octet-stream; rely on decoded content + extension in that case.
+    client_mime = (file.mimetype or "").lower()
+    if (
+        client_mime
+        and client_mime != "application/octet-stream"
+        and client_mime not in accepted_mimes
+    ):
         return error_response("mime type does not match image content", 400)
     if ext not in expected_exts:
         return error_response("file extension does not match image content", 400)

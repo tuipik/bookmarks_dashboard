@@ -361,14 +361,24 @@ if(bgFileInput){
     if(!file) return
     try{
       const res = await uploadBackground(file)
-      if(!res.ok) throw new Error('upload failed')
+      if(!res.ok){
+        let apiMessage = 'Failed to upload background image'
+        try{
+          const payload = await res.json()
+          const message = payload?.error?.message
+          if(message) apiMessage = `Failed to upload background image: ${message}`
+        }catch(_err){
+          // no-op: keep generic message
+        }
+        throw new Error(apiMessage)
+      }
       await res.json()
       // set returned url into the image input so user can save settings
       // refresh settings from server (upload endpoint updates DB)
       await loadSettings()
       notifySuccess('Background uploaded and applied')
     }catch(err){
-      notifyError('Failed to upload background image')
+      notifyError(err?.message || 'Failed to upload background image')
     }
   })
 }

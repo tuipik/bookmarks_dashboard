@@ -1,5 +1,18 @@
 from io import BytesIO
 
+from PIL import Image
+
+
+def make_image_file(
+    image_format: str = "PNG",
+    filename: str = "bg.png",
+    mimetype: str | None = None,
+) -> tuple[BytesIO, str, str | None]:
+    stream = BytesIO()
+    Image.new("RGB", (12, 12), color=(64, 128, 192)).save(stream, format=image_format)
+    stream.seek(0)
+    return stream, filename, mimetype
+
 
 def test_index_page_available(client):
     res = client.get("/")
@@ -82,3 +95,39 @@ def test_upload_bg_rejects_non_image_content(client):
     )
     assert res.status_code == 400
     assert "invalid image content" in res.get_json()["error"]["message"]
+
+
+def test_upload_bg_accepts_octet_stream_for_valid_image(client):
+    image_file = make_image_file(mimetype="application/octet-stream")
+    res = client.post(
+        "/api/upload-bg",
+        data={"file": image_file},
+        content_type="multipart/form-data",
+    )
+    assert res.status_code == 200
+    payload = res.get_json()
+    assert payload["url"].startswith("/static/uploads/")
+
+
+def test_upload_bg_accepts_jpg_alias_for_jpeg(client):
+    image_file = make_image_file(image_format="JPEG", filename="bg.jpg", mimetype="image/jpg")
+    res = client.post(
+        "/api/upload-bg",
+        data={"file": image_file},
+        content_type="multipart/form-data",
+    )
+    assert res.status_code == 200
+    payload = res.get_json()
+    assert payload["url"].endswith(".jpg")
+
+
+def test_upload_bg_accepts_jfif_extension(client):
+    image_file = make_image_file(image_format="JPEG", filename="bg.jfif", mimetype="image/jpeg")
+    res = client.post(
+        "/api/upload-bg",
+        data={"file": image_file},
+        content_type="multipart/form-data",
+    )
+    assert res.status_code == 200
+    payload = res.get_json()
+    assert payload["url"].endswith(".jfif")

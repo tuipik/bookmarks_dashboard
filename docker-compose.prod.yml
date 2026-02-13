@@ -18,9 +18,8 @@ services:
       UPLOAD_DIR: /app/static/uploads
     restart: unless-stopped
     volumes:
-      - app_data_prod:/app/data
+      - ./storage:/app/data
       - app_uploads_prod:/app/static/uploads
 
 volumes:
-  app_data_prod:
   app_uploads_prod:

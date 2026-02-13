@@ -19,9 +19,8 @@ services:
       UPLOAD_DIR: /app/static/uploads
     volumes:
       - .:/app
-      - app_data:/app/data
+      - ./storage:/app/data
       - app_uploads:/app/static/uploads
 
 volumes:
-  app_data:
   app_uploads:
