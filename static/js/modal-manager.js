@@ -86,6 +86,7 @@ export const cardModal = {
     if (url) {
       const img = document.createElement("img");
       img.src = url;
+      img.crossOrigin = "anonymous";
       preview.appendChild(img);
     }
   },

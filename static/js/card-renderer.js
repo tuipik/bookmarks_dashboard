@@ -76,6 +76,7 @@ export function createCardElement(card, columnId, columnElement, onCardClick) {
     const img = document.createElement("img");
     img.src = card.icon;
     img.className = "card-icon";
+    img.crossOrigin = "anonymous";
     title.appendChild(img);
   }
 
