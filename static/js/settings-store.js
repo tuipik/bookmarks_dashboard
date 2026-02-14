@@ -29,16 +29,33 @@ export function applySettingsToDom(settings) {
   const root = document.documentElement;
   root.style.setProperty("--cols-per-row", settings.cols_per_row);
   root.style.setProperty("--column-width", `${settings.column_width}px`);
-  root.style.setProperty("--card-height", settings.card_height > 0 ? `${settings.card_height}px` : "auto");
+  root.style.setProperty(
+    "--card-height",
+    settings.card_height > 0 ? `${settings.card_height}px` : "auto",
+  );
 
   const bgEl = document.getElementById("bg");
   if (bgEl) {
-    bgEl.style.backgroundImage = settings.dashboard_bg_image?.trim()
-      ? `url(${settings.dashboard_bg_image})`
-      : "";
+    if (settings.dashboard_bg_image?.trim()) {
+      // Apply custom background with fixed positioning
+      bgEl.classList.add("has-custom-bg");
+      bgEl.style.backgroundImage = `url(${settings.dashboard_bg_image})`;
+      bgEl.style.backgroundSize = "cover";
+      bgEl.style.backgroundPosition = "center center";
+      bgEl.style.backgroundRepeat = "no-repeat";
+      bgEl.style.backgroundAttachment = "fixed";
+    } else {
+      // Reset to default gradient
+      bgEl.classList.remove("has-custom-bg");
+      bgEl.style.backgroundImage = "";
+      bgEl.style.backgroundSize = "";
+      bgEl.style.backgroundPosition = "";
+      bgEl.style.backgroundRepeat = "";
+      bgEl.style.backgroundAttachment = "";
+    }
   } else {
     document.body.style.background = settings.dashboard_bg_image?.trim()
-      ? `url(${settings.dashboard_bg_image}) center/cover no-repeat`
+      ? `url(${settings.dashboard_bg_image}) center/cover no-repeat fixed`
       : "";
   }
 
@@ -56,6 +73,20 @@ export function applySettingsToDom(settings) {
         "--card-bg",
         `rgba(${c2.r}, ${c2.g}, ${c2.b}, ${parseFloat(settings.card_bg_opacity ?? 1)})`,
       );
+
+      // Автоматично визначити контрастний колір тексту
+      const textMode = getContrastTextColor(settings.card_bg_color);
+      if (textMode === "dark") {
+        // Для світлих карток - темний текст
+        root.style.setProperty("--card-text-color", "#0f172a");
+        root.style.setProperty("--card-text-muted", "#475569");
+        root.style.setProperty("--card-link-color", "#2563eb");
+      } else {
+        // Для темних карток - світлий текст
+        root.style.setProperty("--card-text-color", "#f1f5f9");
+        root.style.setProperty("--card-text-muted", "#cbd5e1");
+        root.style.setProperty("--card-link-color", "#60a5fa");
+      }
     }
   } catch (_err) {
     // ignore color parse errors
@@ -69,11 +100,37 @@ export function applySettingsToDom(settings) {
 
 function hexToRgb(hex) {
   const normalized = hex.replace("#", "");
-  const full = normalized.length === 3 ? normalized.split("").map((ch) => ch + ch).join("") : normalized;
+  const full =
+    normalized.length === 3
+      ? normalized
+          .split("")
+          .map((ch) => ch + ch)
+          .join("")
+      : normalized;
   const intValue = parseInt(full, 16);
   return {
     r: (intValue >> 16) & 255,
     g: (intValue >> 8) & 255,
     b: intValue & 255,
   };
+}
+
+/**
+ * Визначити яскравість кольору (0-255)
+ * Використовує стандартну формулу яскравості для людського ока
+ */
+export function getColorBrightness(hex) {
+  const rgb = hexToRgb(hex);
+  // Формула: (R*0.299 + G*0.587 + B*0.114)
+  return rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114;
+}
+
+/**
+ * Визначити кольору контрастного тексту для фону
+ * Повертає 'dark' для світлих фонів, 'light' для темних
+ */
+export function getContrastTextColor(backgroundColor) {
+  const brightness = getColorBrightness(backgroundColor);
+  // Якщо фон яскравий (> 128), потрібен темний текст
+  return brightness > 128 ? "dark" : "light";
 }
