@@ -223,7 +223,6 @@ main#board {
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
 }
 
 .column::before {

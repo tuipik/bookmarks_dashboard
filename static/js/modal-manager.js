@@ -40,6 +40,13 @@ export const cardModal = {
       .getElementById("modalCloseBtn")
       .addEventListener("click", () => this.close());
 
+    // Escape key handler
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !this.element.classList.contains("hidden")) {
+        this.close();
+      }
+    });
+
     this.form.addEventListener("input", (e) => {
       if (e.target.name === "icon") this.showIconPreview(e.target.value);
     });
@@ -198,6 +205,14 @@ export const settingsModal = {
       .addEventListener("click", () => this.close());
     this.closeBtn.addEventListener("click", () => this.close());
     this.openBtn.addEventListener("click", () => this.open());
+    
+    // Escape key handler
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !this.element.classList.contains("hidden")) {
+        this.close();
+      }
+    });
+    
     this.form.addEventListener("submit", (e) => this.handleSettingsSubmit(e));
     this.addColumnForm.addEventListener("submit", (e) =>
       this.handleAddColumn(e),

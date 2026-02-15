@@ -177,7 +177,6 @@ function attachCardDropHandlers(cardElement, card, columnId, columnElement) {
 export function attachColumnDropHandlers(columnElement, columnId) {
   columnElement.addEventListener("dragover", (ev) => {
     if (!dragManager.isCardDrag()) return;
-    if (!dragManager.cardBelongsToColumn(columnId)) return;
 
     ev.preventDefault();
     ev.dataTransfer.dropEffect = "move";
@@ -185,9 +184,9 @@ export function attachColumnDropHandlers(columnElement, columnId) {
 
   columnElement.addEventListener("drop", async (ev) => {
     if (!dragManager.isCardDrag()) return;
-    if (!dragManager.cardBelongsToColumn(columnId)) return;
 
     const draggedCardId = dragManager.state.cardId;
+    const sourceColumnId = dragManager.state.columnId;
     ev.preventDefault();
 
     const draggedEl = document.querySelector(
@@ -198,10 +197,23 @@ export function attachColumnDropHandlers(columnElement, columnId) {
     // Додати картку в кінець колони
     columnElement.appendChild(draggedEl);
 
-    // Оновити порядок карт на сервері
+    // Оновити порядок карт у дестинейшен колоні
     const order = Array.from(columnElement.querySelectorAll(".card")).map(
       (x) => x.dataset.id,
     );
     await reorderColumnCards(columnId, order);
+
+    // Якщо картка була перенесена з іншої колони, оновити порядок там тобі
+    if (sourceColumnId !== String(columnId)) {
+      const sourceColumn = document.querySelector(
+        `.column[data-id="${sourceColumnId}"]`,
+      );
+      if (sourceColumn) {
+        const sourceOrder = Array.from(
+          sourceColumn.querySelectorAll(".card"),
+        ).map((x) => x.dataset.id);
+        await reorderColumnCards(sourceColumnId, sourceOrder);
+      }
+    }
   });
 }
