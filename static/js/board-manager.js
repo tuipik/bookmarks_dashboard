@@ -105,7 +105,7 @@ export const boardManager = {
   /**
    * Видалити всі елементи з дошки
    */
-  clear() {
+  clearBoard() {
     const main = this.getMainBoard();
     main.innerHTML = "";
   },

@@ -322,7 +322,7 @@ const app = {
   },
 
   renderBoard() {
-    boardManager.clear();
+    boardManager.clearBoard();
     const main = boardManager.getMainBoard();
     boardManager.initializeBoardDragHandlers(main);
 
@@ -345,7 +345,8 @@ window.app = {
   saveSettings: () => app.saveSettings(),
   handleBgUpload: (e) => app.handleBgUpload(e),
   resetBg: () => app.resetBg(),
+  clearBoard: () => boardManager.clearBoard(), 
 };
 
-// === BOOTSTRAP ===
+
 app.init();
