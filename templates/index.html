@@ -10,7 +10,7 @@
     <div id="bg" aria-hidden="true"></div>
 
     <header>
-      <div class = 'header-flex'>
+      <div class="header-flex">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -256,148 +256,151 @@
         <!-- Layout tab -->
         <div id="layout-tab" class="tab-content active">
           <form id="settingsLayout">
-            <label>
-              Dashboard title
-              <input
-                type="text"
-                name="dashboard_title"
-                value="Start Dashboard"
-                placeholder="My Dashboard"
-              />
-            </label>
+            <div class="modal-section">
+              <label>
+                Dashboard title
+                <input
+                  type="text"
+                  name="dashboard_title"
+                  value="Start Dashboard"
+                  placeholder="My Dashboard"
+                />
+              </label>
 
-            <label>
-              Upload background image
-              <input type="file" id="dashboard_bg_file" accept="image/*" />
-              <small class="field-hint">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  style="
-                    display: inline-block;
-                    vertical-align: middle;
-                    margin-right: 4px;
-                  "
-                >
-                  <path
-                    fill="currentColor"
-                    d="M12 16q.425 0 .713-.288T13 15v-4.025l1.3 1.3q.275.275.7.275t.7-.275t.275-.7t-.275-.7l-2.6-2.6q-.3-.3-.7-.3t-.7.3l-2.6 2.6q-.275.275-.275.7t.275.7t.7.275t.7-.275l1.3-1.3V15q0 .425.288.713T12 16m-6 5q-.825 0-1.412-.587T4 19V5q0-.825.588-1.412T6 3h8l6 6v10q0 .825-.587 1.413T18 21zm7-13V4H6v15h12V9h-4z"
-                  />
-                </svg>
-                Recommended: High-resolution images (1920x1080 or larger)
-              </small>
-            </label>
+              <label>
+                Upload background image
+                <input type="file" id="dashboard_bg_file" accept="image/*" />
+                <small class="field-hint">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    style="
+                      display: inline-block;
+                      vertical-align: middle;
+                      margin-right: 4px;
+                    "
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M12 16q.425 0 .713-.288T13 15v-4.025l1.3 1.3q.275.275.7.275t.7-.275t.275-.7t-.275-.7l-2.6-2.6q-.3-.3-.7-.3t-.7.3l-2.6 2.6q-.275.275-.275.7t.275.7t.7.275t.7-.275l1.3-1.3V15q0 .425.288.713T12 16m-6 5q-.825 0-1.412-.587T4 19V5q0-.825.588-1.412T6 3h8l6 6v10q0 .825-.587 1.413T18 21zm7-13V4H6v15h12V9h-4z"
+                    />
+                  </svg>
+                  Recommended: High-resolution images (1920x1080 or larger)
+                </small>
+              </label>
 
-            <div class="settings-inline-actions">
-              <button type="button" id="resetBgBtn">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M12 21q-3.45 0-6.012-2.287T3.05 13H5.1q.35 2.6 2.313 4.3T12 19q2.925 0 4.963-2.037T19 12t-2.037-4.962T12 5q-1.725 0-3.225.8T6.25 8H9v2H3V4h2v2.35q1.275-1.6 3.113-2.475T12 3q1.875 0 3.513.713t2.85 1.924t1.925 2.85T21 12t-.712 3.513t-1.925 2.85t-2.85 1.925T12 21m2.8-4.8L11 12.4V7h2v4.6l3.2 3.2z"
-                  />
-                </svg>
-                Reset background
-              </button>
+              <div class="settings-inline-actions">
+                <button type="button" id="resetBgBtn">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M12 21q-3.45 0-6.012-2.287T3.05 13H5.1q.35 2.6 2.313 4.3T12 19q2.925 0 4.963-2.037T19 12t-2.037-4.962T12 5q-1.725 0-3.225.8T6.25 8H9v2H3V4h2v2.35q1.275-1.6 3.113-2.475T12 3q1.875 0 3.513.713t2.85 1.924t1.925 2.85T21 12t-.712 3.513t-1.925 2.85t-2.85 1.925T12 21m2.8-4.8L11 12.4V7h2v4.6l3.2 3.2z"
+                    />
+                  </svg>
+                  Reset background
+                </button>
+              </div>
             </div>
+            <div class="modal-section">
+              <label>
+                Columns per row
+                <input
+                  type="number"
+                  name="cols_per_row"
+                  min="1"
+                  max="10"
+                  value="3"
+                />
+                <small class="field-hint"
+                  >Number of columns displayed in each row</small
+                >
+              </label>
 
-            <label>
-              Columns per row
-              <input
-                type="number"
-                name="cols_per_row"
-                min="1"
-                max="10"
-                value="3"
-              />
-              <small class="field-hint"
-                >Number of columns displayed in each row</small
-              >
-            </label>
+              <label>
+                Column width (px)
+                <input
+                  type="number"
+                  name="column_width"
+                  min="200"
+                  max="600"
+                  value="320"
+                />
+              </label>
 
-            <label>
-              Column width (px)
-              <input
-                type="number"
-                name="column_width"
-                min="200"
-                max="600"
-                value="320"
-              />
-            </label>
+              <label>
+                Card height (px)
+                <input
+                  type="number"
+                  name="card_height"
+                  min="0"
+                  value="100"
+                  placeholder="0 = auto height"
+                />
+                <small class="field-hint">Set to 0 for automatic height</small>
+              </label>
+            </div>
+            <div class="modal-section">
+              <label>
+                Column background color
+                <input
+                  type="color"
+                  name="column_bg_color"
+                  id="column_bg_color"
+                  value="#ffffff"
+                />
+              </label>
 
-            <label>
-              Card height (px)
-              <input
-                type="number"
-                name="card_height"
-                min="0"
-                value="100"
-                placeholder="0 = auto height"
-              />
-              <small class="field-hint">Set to 0 for automatic height</small>
-            </label>
+              <label>
+                Column opacity
+                <input
+                  type="range"
+                  id="column_bg_opacity"
+                  name="column_bg_opacity"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value="8"
+                />
+                <span id="column_bg_opacity_val">8%</span>
+                <small class="field-hint"
+                  >Lower values = more transparent
+                </small>
+              </label>
 
-            <label>
-              Column background color
-              <input
-                type="color"
-                name="column_bg_color"
-                id="column_bg_color"
-                value="#ffffff"
-              />
-            </label>
+              <label>
+                Card background color
+                <input
+                  type="color"
+                  name="card_bg_color"
+                  id="card_bg_color"
+                  value="#ffffff"
+                />
+              </label>
 
-            <label>
-              Column opacity
-              <input
-                type="range"
-                id="column_bg_opacity"
-                name="column_bg_opacity"
-                min="0"
-                max="100"
-                step="1"
-                value="8"
-              />
-              <span id="column_bg_opacity_val">8%</span>
-              <small class="field-hint"
-                >Lower values = more transparent </small
-              >
-            </label>
-
-            <label>
-              Card background color
-              <input
-                type="color"
-                name="card_bg_color"
-                id="card_bg_color"
-                value="#ffffff"
-              />
-            </label>
-
-            <label>
-              Card opacity
-              <input
-                type="range"
-                id="card_bg_opacity"
-                name="card_bg_opacity"
-                min="0"
-                max="100"
-                step="1"
-                value="6"
-              />
-              <span id="card_bg_opacity_val">6%</span>
-              <small class="field-hint"
-                >Lower values = more transparent</small
-              >
-            </label>
-
+              <label>
+                Card opacity
+                <input
+                  type="range"
+                  id="card_bg_opacity"
+                  name="card_bg_opacity"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value="6"
+                />
+                <span id="card_bg_opacity_val">6%</span>
+                <small class="field-hint"
+                  >Lower values = more transparent</small
+                >
+              </label>
+            </div>
             <button type="submit">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -36,6 +36,16 @@ export const cardModal = {
     document
       .getElementById("modalClose")
       .addEventListener("click", () => this.close());
+    document
+      .getElementById("modalCloseBtn")
+      .addEventListener("click", () => this.close());
+
+    // Escape key handler
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !this.element.classList.contains("hidden")) {
+        this.close();
+      }
+    });
 
     this.form.addEventListener("input", (e) => {
       if (e.target.name === "icon") this.showIconPreview(e.target.value);
@@ -60,7 +70,7 @@ export const cardModal = {
       this.form.column_id.value = card.column_id;
       this.form.icon.value = card.icon || "";
       this.showIconPreview(card.icon);
-      this.deleteBtn.style.display = "inline-block";
+      this.deleteBtn.style.display = "";
     } else {
       this.titleElement.textContent = "Add card";
       this.form.reset();
@@ -195,6 +205,14 @@ export const settingsModal = {
       .addEventListener("click", () => this.close());
     this.closeBtn.addEventListener("click", () => this.close());
     this.openBtn.addEventListener("click", () => this.open());
+    
+    // Escape key handler
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !this.element.classList.contains("hidden")) {
+        this.close();
+      }
+    });
+    
     this.form.addEventListener("submit", (e) => this.handleSettingsSubmit(e));
     this.addColumnForm.addEventListener("submit", (e) =>
       this.handleAddColumn(e),

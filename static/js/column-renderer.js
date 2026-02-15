@@ -28,9 +28,6 @@ export function createColumnElement(column, onCardClick) {
 
   colTitle.addEventListener("dragend", () => {
     dragManager.reset();
-    document
-      .querySelectorAll(".column")
-      .forEach((x) => x.classList.remove("drop-target"));
   });
 
   colElement.appendChild(colTitle);

@@ -85,9 +85,28 @@ export function createCardElement(card, columnId, columnElement, onCardClick) {
     a.href = card.link;
     a.textContent = card.title;
     a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    // Запобігти double-click edit при натисканню на посилання
+    a.addEventListener(
+      "dblclick",
+      (ev) => {
+        ev.stopPropagation();
+      },
+      true,
+    );
+    a.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+    });
     title.appendChild(a);
   } else {
-    title.appendChild(document.createTextNode(card.title));
+    // Якщо нема посилання - зробимо заголовок кліквим для двійного кліку
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = card.title;
+    titleSpan.style.cursor = "pointer";
+    titleSpan.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+    });
+    title.appendChild(titleSpan);
   }
 
   cd.appendChild(title);
@@ -109,7 +128,11 @@ export function createCardElement(card, columnId, columnElement, onCardClick) {
   });
 
   // === Double-click to edit ===
-  cd.addEventListener("dblclick", () => onCardClick(card));
+  cd.addEventListener("dblclick", (ev) => {
+    // Дозволити double-click на посиланні в заголовку без редагування
+    if (ev.target.tagName === "A") return;
+    onCardClick(card);
+  });
 
   // === Append controls ===
   cd.appendChild(dragHandle);
@@ -150,17 +173,18 @@ function attachCardDropHandlers(cardElement, card, columnId, columnElement) {
       `.card[data-id="${draggedCardId}"]`,
     );
 
-    if (!draggedEl) return;
+    if (!draggedEl || draggedEl === cardElement) return;
 
-    // Визначити позицію для вставки (до або після)
-    const rect = cardElement.getBoundingClientRect();
-    const pos = ev.clientY - rect.top < rect.height / 2 ? "before" : "after";
+    // Поміняти картки місцями
+    const parent = cardElement.parentNode;
+    const draggedParent = draggedEl.parentNode;
 
-    if (pos === "after") {
-      cardElement.parentNode.insertBefore(draggedEl, cardElement.nextSibling);
-    } else {
-      cardElement.parentNode.insertBefore(draggedEl, cardElement);
-    }
+    // Простий swap за допомогою тимчасового елемента
+    const temp = document.createElement("div");
+    draggedParent.insertBefore(temp, draggedEl);
+    parent.insertBefore(draggedEl, cardElement);
+    draggedParent.insertBefore(cardElement, temp);
+    temp.remove();
 
     // Оновити порядок карт на сервері
     const order = Array.from(columnElement.querySelectorAll(".card")).map(
@@ -176,7 +200,6 @@ function attachCardDropHandlers(cardElement, card, columnId, columnElement) {
 export function attachColumnDropHandlers(columnElement, columnId) {
   columnElement.addEventListener("dragover", (ev) => {
     if (!dragManager.isCardDrag()) return;
-    if (!dragManager.cardBelongsToColumn(columnId)) return;
 
     ev.preventDefault();
     ev.dataTransfer.dropEffect = "move";
@@ -184,9 +207,9 @@ export function attachColumnDropHandlers(columnElement, columnId) {
 
   columnElement.addEventListener("drop", async (ev) => {
     if (!dragManager.isCardDrag()) return;
-    if (!dragManager.cardBelongsToColumn(columnId)) return;
 
     const draggedCardId = dragManager.state.cardId;
+    const sourceColumnId = dragManager.state.columnId;
     ev.preventDefault();
 
     const draggedEl = document.querySelector(
@@ -197,10 +220,23 @@ export function attachColumnDropHandlers(columnElement, columnId) {
     // Додати картку в кінець колони
     columnElement.appendChild(draggedEl);
 
-    // Оновити порядок карт на сервері
+    // Оновити порядок карт у дестинейшен колоні
     const order = Array.from(columnElement.querySelectorAll(".card")).map(
       (x) => x.dataset.id,
     );
     await reorderColumnCards(columnId, order);
+
+    // Якщо картка була перенесена з іншої колони, оновити порядок там тобі
+    if (sourceColumnId !== String(columnId)) {
+      const sourceColumn = document.querySelector(
+        `.column[data-id="${sourceColumnId}"]`,
+      );
+      if (sourceColumn) {
+        const sourceOrder = Array.from(
+          sourceColumn.querySelectorAll(".card"),
+        ).map((x) => x.dataset.id);
+        await reorderColumnCards(sourceColumnId, sourceOrder);
+      }
+    }
   });
 }
