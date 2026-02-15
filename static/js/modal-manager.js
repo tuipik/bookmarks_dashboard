@@ -63,7 +63,7 @@ export const cardModal = {
       this.form.column_id.value = card.column_id;
       this.form.icon.value = card.icon || "";
       this.showIconPreview(card.icon);
-      this.deleteBtn.style.display = "inline-block";
+      this.deleteBtn.style.display = "";
     } else {
       this.titleElement.textContent = "Add card";
       this.form.reset();

@@ -351,7 +351,7 @@ main#board {
   border: none;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(var(--blur-sm));
-  color: var(--text);
+  color: var(--card-menu-color, var(--text));
   font-size: 16px;
   border-radius: 6px;
   cursor: pointer;
@@ -701,7 +701,7 @@ select:focus-visible {
   z-index: 101;
   width: 100%;
   max-width: 520px;
-  padding: 24px;
+  padding:  0 24px 24px 24px;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.95);
@@ -709,16 +709,25 @@ select:focus-visible {
   -webkit-backdrop-filter: blur(var(--blur-lg));
   box-shadow: var(--shadow-lg);
   max-height: 90vh;
-  overflow-y: auto;
+  overflow-y:auto;
   animation: slideUp 0.3s ease;
 }
 
 .modal-header {
+  padding-top: 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding-bottom: 12px;
   margin-bottom: 20px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(var(--blur-lg));
+  -webkit-backdrop-filter: blur(var(--blur-lg));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-close-btn {
@@ -1244,6 +1253,16 @@ button:focus-visible,
 option {
   color: #0f172a;
   background-color: #94a3b8;
+}
+
+#deleteBtn {
+  align-items: center;
+  justify-content: center;
+}
+.modal-section {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translateY(5px);
+  margin-bottom: 15px;
 }
 .loading {
   background: linear-gradient(

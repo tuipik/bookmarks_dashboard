@@ -81,11 +81,13 @@ export function applySettingsToDom(settings) {
         root.style.setProperty("--card-text-color", "#0f172a");
         root.style.setProperty("--card-text-muted", "#475569");
         root.style.setProperty("--card-link-color", "#2563eb");
+        root.style.setProperty("--card-menu-color", "#1f2937");
       } else {
         // Для темних карток - світлий текст
         root.style.setProperty("--card-text-color", "#f1f5f9");
         root.style.setProperty("--card-text-muted", "#cbd5e1");
         root.style.setProperty("--card-link-color", "#60a5fa");
+        root.style.setProperty("--card-menu-color", "#e0e7ff");
       }
     }
   } catch (_err) {
