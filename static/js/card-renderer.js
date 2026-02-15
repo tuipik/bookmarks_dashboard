@@ -85,6 +85,14 @@ export function createCardElement(card, columnId, columnElement, onCardClick) {
     a.href = card.link;
     a.textContent = card.title;
     a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    // Запобігти double-click edit при натисканню на посилання
+    a.addEventListener("dblclick", (ev) => {
+      ev.stopPropagation();
+    }, true);
+    a.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+    });
     title.appendChild(a);
   } else {
     title.appendChild(document.createTextNode(card.title));
@@ -108,8 +116,38 @@ export function createCardElement(card, columnId, columnElement, onCardClick) {
     onCardClick(card);
   });
 
+  // === Single-click with delay for double-click detection ===
+  let clickTimeout = null;
+  cd.addEventListener("click", (ev) => {
+    // Якщо клікнули на посилання - дозволити default поведінку
+    if (ev.target.tagName === "A") return;
+    
+    // Якщо клікнули на меню - не робимо нічого (меню сам обробляє)
+    if (ev.target.closest(".card-menu")) return;
+
+    // Затримка подання на посилання для дозволу double-click edit
+    if (clickTimeout) {
+      clearTimeout(clickTimeout);
+      clickTimeout = null;
+      return; // Це був другий клік - дозволяємо double-click обробити його
+    }
+
+    if (card.link) {
+      clickTimeout = setTimeout(() => {
+        window.open(card.link, "_blank");
+        clickTimeout = null;
+      }, 300); // 300ms затримка для double-click
+    }
+  });
+
   // === Double-click to edit ===
-  cd.addEventListener("dblclick", () => onCardClick(card));
+  cd.addEventListener("dblclick", (ev) => {
+    if (clickTimeout) {
+      clearTimeout(clickTimeout);
+      clickTimeout = null;
+    }
+    onCardClick(card);
+  });
 
   // === Append controls ===
   cd.appendChild(dragHandle);

@@ -360,10 +360,12 @@ main#board {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
 .card:hover .card-menu {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .card .card-menu:hover {
@@ -453,6 +455,8 @@ main#board {
   transition: all 0.2s ease;
   font-weight: 500;
   cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
 }
 
 .card a:hover {
