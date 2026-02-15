@@ -181,11 +181,56 @@ header .header-actions button {
   white-space: nowrap;
 }
 
-header .header-actions button svg {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  display: block;
+#openSettings {
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  padding: 10px 12px;
+  font-size: 0;
+  gap: 0;
+}
+
+#openSettings svg {
+  font-size: 16px;
+  transition: transform .4s ease;
+}
+
+#openSettings:hover svg {
+  animation: spin 0.4s linear ;
+}
+
+#openSettings:hover {
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+  transform: none;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
+}
+
+#openSettings::after {
+  content: "Settings";
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  max-width: 0;
+  transition: all 0.6s ease;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-left: 0;
+}
+
+#openSettings:hover::after {
+  opacity: 1;
+  margin-left: 6px;
+  max-width: 100px;
 }
 
 header .header-actions button:hover {
@@ -329,6 +374,7 @@ main#board {
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
 .card:hover {
@@ -447,6 +493,11 @@ main#board {
   font-size: 13px;
   white-space: pre-wrap;
   line-height: 1.6;
+  user-select: text;
+}
+
+.card .desc a {
+  user-select: text;
 }
 
 .card a {
@@ -460,8 +511,13 @@ main#board {
 }
 
 .card a:hover {
-  color: #93c5fd;
+  /* color: #93c5fd; */
   text-decoration: underline;
+}
+
+.card a:active {
+  color: var(--card-link-color);
+  text-decoration: none;
 }
 
 .card .title a {
