@@ -453,11 +453,18 @@ main#board {
   text-decoration: none;
   transition: all 0.2s ease;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .card a:hover {
   color: #93c5fd;
   text-decoration: underline;
+}
+
+.card .title a {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
 }
 
 /* Custom Scrollbar */
@@ -822,6 +829,10 @@ select:focus-visible {
 .modal-actions button {
   flex: 1 1 auto;
   min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .danger {
