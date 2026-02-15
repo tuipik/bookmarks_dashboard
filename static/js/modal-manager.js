@@ -36,6 +36,9 @@ export const cardModal = {
     document
       .getElementById("modalClose")
       .addEventListener("click", () => this.close());
+    document
+      .getElementById("modalCloseBtn")
+      .addEventListener("click", () => this.close());
 
     this.form.addEventListener("input", (e) => {
       if (e.target.name === "icon") this.showIconPreview(e.target.value);
