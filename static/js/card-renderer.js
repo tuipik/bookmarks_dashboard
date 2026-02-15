@@ -150,17 +150,18 @@ function attachCardDropHandlers(cardElement, card, columnId, columnElement) {
       `.card[data-id="${draggedCardId}"]`,
     );
 
-    if (!draggedEl) return;
+    if (!draggedEl || draggedEl === cardElement) return;
 
-    // Визначити позицію для вставки (до або після)
-    const rect = cardElement.getBoundingClientRect();
-    const pos = ev.clientY - rect.top < rect.height / 2 ? "before" : "after";
+    // Поміняти картки місцями
+    const parent = cardElement.parentNode;
+    const draggedParent = draggedEl.parentNode;
 
-    if (pos === "after") {
-      cardElement.parentNode.insertBefore(draggedEl, cardElement.nextSibling);
-    } else {
-      cardElement.parentNode.insertBefore(draggedEl, cardElement);
-    }
+    // Простий swap за допомогою тимчасового елемента
+    const temp = document.createElement("div");
+    draggedParent.insertBefore(temp, draggedEl);
+    parent.insertBefore(draggedEl, cardElement);
+    draggedParent.insertBefore(cardElement, temp);
+    temp.remove();
 
     // Оновити порядок карт на сервері
     const order = Array.from(columnElement.querySelectorAll(".card")).map(

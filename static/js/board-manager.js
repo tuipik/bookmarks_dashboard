@@ -32,18 +32,39 @@ export const boardManager = {
    */
   handleBoardDragOver(ev) {
     if (dragManager.state.type !== "column") return;
+    ev.preventDefault();
+    ev.dataTransfer.dropEffect = "move";
+  },
+
+  /**
+   * Обробник dragleave для дошки
+   */
+  handleBoardDragLeave(ev) {
+    // Нічого не робимо - swap відбувається при drop
+  },
+
+  /**
+   * Обробник drop для дошки
+   */
+  async handleBoardDrop(ev) {
+    if (dragManager.state.type !== "column") return;
 
     ev.preventDefault();
     const main = ev.currentTarget;
 
-    // Автоскролл при наведенні до меж
-    const margin = 60;
-    if (ev.clientY < margin) window.scrollBy(0, -20);
-    else if (window.innerHeight - ev.clientY < margin) window.scrollBy(0, 20);
+    const draggedId = dragManager.state.columnId;
+    const draggedEl = document.querySelector(
+      '.column[data-id="' + draggedId + '"]',
+    );
 
     // Знайти найближчу колону за X координатою
-    const cols = Array.from(document.querySelectorAll(".column"));
-    if (cols.length === 0) return;
+    const cols = Array.from(document.querySelectorAll(".column")).filter(
+      (c) => c.dataset.id !== draggedId,
+    );
+    if (cols.length === 0 || !draggedEl) {
+      dragManager.reset();
+      return;
+    }
 
     let closest = null;
     let minDist = Infinity;
@@ -58,99 +79,28 @@ export const boardManager = {
       }
     });
 
-    if (!closest) return;
+    if (closest && draggedEl !== closest) {
+      // Поміняти колони місцями
+      const parent = closest.parentNode;
+      const draggedParent = draggedEl.parentNode;
 
-    // Показати індикатор
-    document
-      .querySelectorAll(".column")
-      .forEach((c) => c.classList.remove("drop-target"));
-    closest.classList.add("drop-target");
+      // Простий swap за допомогою тимчасового елемента
+      const temp = document.createElement("div");
+      draggedParent.insertBefore(temp, draggedEl);
+      parent.insertBefore(draggedEl, closest);
+      draggedParent.insertBefore(closest, temp);
+      temp.remove();
 
-    // Показати позицію før/після на основі горизонтальної позиції
-    this.clearPlaceholder();
-    const ph = this.createPlaceholder();
-    const rect = closest.getBoundingClientRect();
-
-    if (ev.clientX - rect.left < rect.width / 2) {
-      closest.parentNode.insertBefore(ph, closest);
-    } else {
-      closest.parentNode.insertBefore(ph, closest.nextSibling);
-    }
-
-    main._placeholder = ph;
-  },
-
-  /**
-   * Обробник dragleave для дошки
-   */
-  handleBoardDragLeave(ev) {
-    if (ev.currentTarget.contains(ev.relatedTarget)) return;
-    this.clearPlaceholder();
-    document
-      .querySelectorAll(".column")
-      .forEach((c) => c.classList.remove("drop-target"));
-  },
-
-  /**
-   * Обробник drop для дошки
-   */
-  async handleBoardDrop(ev) {
-    if (dragManager.state.type !== "column") return;
-
-    ev.preventDefault();
-    const main = ev.currentTarget;
-    const ph = main._placeholder;
-
-    if (!ph) {
-      document
-        .querySelectorAll(".column")
-        .forEach((c) => c.classList.remove("drop-target"));
-      return;
-    }
-
-    const draggedId = dragManager.state.columnId;
-    const draggedEl = document.querySelector(
-      '.column[data-id="' + draggedId + '"]',
-    );
-
-    if (draggedEl) {
-      ph.parentNode.insertBefore(draggedEl, ph);
       const order = Array.from(document.querySelectorAll(".column")).map(
         (x) => x.dataset.id,
       );
       await reorderColumns(order);
     }
 
-    this.clearPlaceholder();
-    document
-      .querySelectorAll(".column")
-      .forEach((c) => c.classList.remove("drop-target"));
     dragManager.reset();
   },
 
-  /**
-   * Створити елемент для індикатора позиції
-   */
-  createPlaceholder() {
-    const ph = document.createElement("div");
-    ph.className = "drop-placeholder";
-    return ph;
-  },
 
-  /**
-   * Очистити індикатор позиції
-   */
-  clearPlaceholder() {
-    const main = this.getMainBoard();
-    if (main && main._placeholder) {
-      try {
-        main._placeholder.remove();
-      } catch (e) {
-        // ignore
-      }
-      main._placeholder = null;
-    }
-  },
 
   /**
    * Видалити всі елементи з дошки

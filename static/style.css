@@ -701,7 +701,7 @@ select:focus-visible {
   z-index: 101;
   width: 100%;
   max-width: 520px;
-  padding:  0 24px 24px 24px;
+  padding: 0 24px 24px 24px;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.95);
@@ -709,7 +709,7 @@ select:focus-visible {
   -webkit-backdrop-filter: blur(var(--blur-lg));
   box-shadow: var(--shadow-lg);
   max-height: 90vh;
-  overflow-y:auto;
+  overflow-y: auto;
   animation: slideUp 0.3s ease;
 }
 
@@ -988,17 +988,30 @@ select:focus-visible {
 
 /* Drag and Drop */
 .drop-placeholder {
-  height: 40px;
-  margin: 8px 0;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-sm);
-  background: rgba(59, 130, 246, 0.05);
+  min-width: 4px;
+  max-width: 4px;
+  border-left: 3px solid var(--accent);
+  border-radius: 2px;
+  background: rgba(59, 130, 246, 0.3);
+  animation: pulsePlaceholder 1s ease-in-out infinite;
+  grid-column: auto;
+}
+
+@keyframes pulsePlaceholder {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .column.drop-target {
-  outline: 2px dashed var(--accent);
-  outline-offset: 2px;
-  background: rgba(59, 130, 246, 0.05);
+  border-color: var(--accent);
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  transition: all 0.15s ease;
 }
 
 /* Toast Notifications */
